@@ -1,0 +1,1263 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Kalkulator Analisa Nikmat Abadi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+        .font-mono-num { font-family: 'JetBrains Mono', monospace; }
+        @keyframes scaleUp {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .modal-animate { animation: scaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @media print {
+            body * { visibility: hidden; }
+            #print-area, #print-area * { visibility: visible; }
+            #print-area { position: absolute; left: 0; top: 0; width: 100%; background: white !important; color: black !important; }
+            .no-print { display: none !important; }
+        }
+    </style>
+</head>
+<body class="bg-[#0f172a] text-slate-100 min-h-screen pb-24 sm:pb-12">
+
+    <!-- Header Gelap & Modern (4 Menu Utama) -->
+    <header class="bg-[#1e293b]/90 backdrop-blur-md border-b border-slate-800 sticky top-0 z-40 shadow-md">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex flex-col sm:flex-row justify-between items-center gap-3">
+            <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
+                <div class="flex items-center gap-3">
+                    <div class="bg-indigo-600 p-2 rounded-xl shadow-lg shadow-indigo-500/30">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                    </div>
+                    <div>
+                        <h1 class="text-sm sm:text-base font-bold tracking-tight text-white leading-tight">Analisa Nikmat Abadi</h1>
+                        <p class="text-[10px] sm:text-xs text-slate-400">Kalkulator HPP & Manajemen Usaha</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Navigasi Desktop -->
+            <nav class="hidden sm:flex bg-[#0f172a] p-1.5 rounded-xl border border-slate-800 shadow-inner gap-1">
+                <button onclick="switchTab('kalkulator')" id="nav-kalkulator-desk" class="px-3.5 py-2 rounded-lg text-xs font-bold transition-all bg-indigo-600 text-white shadow-md">Kalkulator</button>
+                <button onclick="switchTab('rekap')" id="nav-rekap-desk" class="px-3.5 py-2 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white">Rekap & Stok</button>
+                <button onclick="switchTab('plastik')" id="nav-plastik-desk" class="px-3.5 py-2 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white">Perlengkapan Kemas</button>
+                <button onclick="switchTab('nota')" id="nav-nota-desk" class="px-3.5 py-2 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white">Nota Belanja</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-3 sm:px-4 mt-4 sm:mt-6 space-y-4 sm:space-y-6">
+        
+        <!-- MENU 1: KALKULATOR -->
+        <div id="tab-kalkulator" class="space-y-4 sm:space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                <!-- Permen -->
+                <div class="bg-[#1e293b]/90 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-xl space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                        <h2 class="font-bold text-xs sm:text-sm text-indigo-400 flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-indigo-500"></span> 1. Data Permen (Dus & Pack Gabungan)
+                        </h2>
+                        <span class="text-[9px] sm:text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded-md font-medium border border-slate-700">Input & Akumulasi</span>
+                    </div>
+
+                    <div class="space-y-2.5 text-xs bg-[#0f172a]/50 p-3 rounded-xl border border-slate-800">
+                        <span class="font-bold text-amber-400 text-[11px] block uppercase tracking-wider">A. Belanja Per Dus</span>
+                        <div>
+                            <label class="block text-slate-400 mb-1 font-medium">Nama Permen</label>
+                            <input type="text" id="p-nama" oninput="calculate()" class="w-full bg-[#0f172a] border border-slate-700 rounded-xl px-3 py-2 text-white font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-slate-400 mb-1">Harga Belanja /Dus</label>
+                                <input type="text" inputmode="numeric" id="p-harga" oninput="formatInput(this)" class="w-full bg-[#0f172a] border border-slate-700 rounded-lg px-2.5 py-1.5 text-white font-mono-num font-bold">
+                            </div>
+                            <div>
+                                <label class="block text-slate-400 mb-1">Banyak Belanja (Dus)</label>
+                                <input type="text" inputmode="numeric" id="p-jml" oninput="formatInput(this)" class="w-full bg-[#0f172a] border border-slate-700 rounded-lg px-2.5 py-1.5 text-white font-mono-num font-bold">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2 pt-1">
+                            <div>
+                                <label class="block text-slate-400 mb-1">Banyak Dus</label>
+                                <input type="text" inputmode="numeric" id="p-dus" oninput="formatInput(this)" class="w-full bg-[#0f172a] border border-slate-700 rounded-lg px-2.5 py-1.5 text-white font-mono-num font-bold">
+                            </div>
+                            <div>
+                                <label class="block text-slate-400 mb-1">Isi Dus/Pack</label>
+                                <input type="text" inputmode="numeric" id="p-isidus" oninput="formatInput(this)" class="w-full bg-[#0f172a] border border-slate-700 rounded-lg px-2.5 py-1.5 text-white font-mono-num font-bold">
+                            </div>
+                            <div>
+                                <label class="block text-slate-400 mb-1">Isi Pack/Butir</label>
+                                <input type="text" inputmode="numeric" id="p-isipack" oninput="formatInput(this)" class="w-full bg-[#0f172a] border border-slate-700 rounded-lg px-2.5 py-1.5 text-white font-mono-num font-bold">
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center pt-1 text-[11px] border-t border-slate-800">
+                            <span class="text-slate-400">Total Belanja Dus:</span>
+                            <span id="p-total-belanja" class="font-mono-num font-bold text-emerald-400">Rp 0</span>
+                        </div>
+                        <div class="flex justify-between items-center text-[11px]">
+                            <span class="text-slate-400">Total Butir Dus:</span>
+                            <span id="p-tbutir" class="font-mono-num font-bold text-indigo-300">0 butir</span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2.5 text-xs bg-[#0f172a]/50 p-3 rounded-xl border border-slate-800">
+                        <span class="font-bold text-sky-400 text-[11px] block uppercase tracking-wider">B. Belanja Per Pack / Eceran Tambahan</span>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-slate-400 mb-1">Harga Belanja /Pack</label>
+                                <input type="text" inputmode="numeric" id="ppcs-harga" oninput="formatInput(this)" class="w-full bg-[#0f172a] border border-slate-700 rounded-lg px-2.5 py-1.5 text-white font-mono-num font-bold">
+                            </div>
+                            <div>
+                                <label class="block text-slate-400 mb-1">Banyak Belanja (Pack)</label>
+                                <input type="text" inputmode="numeric" id="ppcs-jml" oninput="formatInput(this)" class="w-full bg-[#0f172a] border border-slate-700 rounded-lg px-2.5 py-1.5 text-white font-mono-num font-bold">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2 pt-1">
+                            <div>
+                                <label class="block text-slate-400 mb-1">Banyak Pack</label>
+                                <input type="text" inputmode="numeric" id="ppcs-banyakpack" oninput="formatInput(this)" class="w-full bg-[#0f172a] border border-slate-700 rounded-lg px-2.5 py-1.5 text-white font-mono-num font-bold">
+                            </div>
+                            <div>
+                                <label class="block text-slate-400 mb-1">Isi per Pack</label>
+                                <input type="text" inputmode="numeric" id="ppcs-isiperpack" oninput="formatInput(this)" class="w-full bg-[#0f172a] border border-slate-700 rounded-lg px-2.5 py-1.5 text-white font-mono-num font-bold">
+                            </div>
+                            <div>
+                                <label class="block text-slate-400 mb-1">Isi Pack/Butir</label>
+                                <input type="text" inputmode="numeric" id="ppcs-isipackbutir" oninput="formatInput(this)" class="w-full bg-[#0f172a] border border-slate-700 rounded-lg px-2.5 py-1.5 text-white font-mono-num font-bold">
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center pt-1 text-[11px] border-t border-slate-800">
+                            <span class="text-slate-400">Total Belanja Pack:</span>
+                            <span id="ppcs-total-belanja" class="font-mono-num font-bold text-emerald-400">Rp 0</span>
+                        </div>
+                        <div class="flex justify-between items-center text-[11px]">
+                            <span class="text-slate-400">Total Butir Pack:</span>
+                            <span id="ppcs-tpack" class="font-mono-num font-bold text-indigo-300">0 butir</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-[#0f172a] p-3 rounded-xl border border-indigo-500/40 space-y-1.5">
+                        <div class="flex justify-between text-xs text-slate-300">
+                            <span>Akumulasi Total Belanja Permen:</span>
+                            <span id="akumulasi-total-belanja" class="font-mono-num font-bold text-emerald-400">Rp 0</span>
+                        </div>
+                        <div class="flex justify-between text-xs text-slate-300">
+                            <span>Akumulasi Total Butir Permen:</span>
+                            <span id="akumulasi-total-butir" class="font-mono-num font-bold text-indigo-300">0 butir</span>
+                        </div>
+                        <div class="flex justify-between items-center pt-2 border-t border-slate-800">
+                            <span class="text-indigo-300 font-bold text-xs">Harga Satuan Rata-Rata (HPP Butir):</span>
+                            <span id="akumulasi-harga-satuan" class="font-mono-num font-bold text-sm text-indigo-400">Rp 0 /butir</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kemasan -->
+                <div class="bg-[#1e293b]/90 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-xl space-y-3 sm:space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                        <h2 class="font-bold text-xs sm:text-sm text-indigo-400 flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-indigo-500"></span> 2. Data Kemasan (Teko/Toples)
+                        </h2>
+                        <span class="text-[9px] sm:text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded-md font-medium border border-slate-700">Input & Otomatis</span>
+                    </div>
+
+                    <div class="space-y-2.5 sm:space-y-3 text-xs">
+                        <div>
+                            <label class="block text-slate-400 mb-1 font-medium">Nama Kemasan (Input)</label>
+                            <input type="text" id="k-nama" oninput="calculate()" class="w-full bg-[#0f172a] border border-slate-700 rounded-xl px-3 py-2 text-white font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 sm:gap-3">
+                            <div>
+                                <label class="block text-slate-400 mb-1 font-medium">Harga Kemasan</label>
+                                <input type="text" inputmode="numeric" id="k-harga" oninput="formatInput(this)" class="w-full bg-[#0f172a] border border-slate-700 rounded-xl px-3 py-2 text-white font-mono-num font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <div>
+                                <label class="block text-slate-400 mb-1 font-medium">Banyak Belanja (Lusin)</label>
+                                <input type="text" inputmode="numeric" id="k-jml" oninput="formatInput(this)" class="w-full bg-[#0f172a] border border-slate-700 rounded-xl px-3 py-2 text-white font-mono-num font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                        </div>
+                        <div class="bg-[#0f172a]/60 p-2.5 sm:p-3 rounded-xl border border-slate-800 flex justify-between items-center">
+                            <span class="text-slate-400 font-medium">Jumlah Belanja Total:</span>
+                            <span id="k-total-belanja" class="font-mono-num font-bold text-xs sm:text-sm text-emerald-400">Rp 0</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 sm:gap-3 pt-1">
+                            <div>
+                                <label class="block text-slate-400 mb-1">Banyak Lusin</label>
+                                <input type="text" inputmode="numeric" id="k-lusin" oninput="formatInput(this)" class="w-full bg-[#0f172a] border border-slate-700 rounded-lg px-2.5 py-1.5 text-white font-mono-num font-bold">
+                            </div>
+                            <div>
+                                <label class="block text-slate-400 mb-1">Isi per Lusin</label>
+                                <input type="text" inputmode="numeric" id="k-isilusin" oninput="formatInput(this)" class="w-full bg-[#0f172a] border border-slate-700 rounded-lg px-2.5 py-1.5 text-white font-mono-num font-bold">
+                            </div>
+                        </div>
+                        <div class="space-y-1 pt-2 border-t border-slate-800 text-[11px]">
+                            <div class="flex justify-between text-slate-400"><span>Total Barang Keseluruhan:</span> <span id="k-tbarang" class="font-mono-num font-bold text-indigo-400">0 pcs</span></div>
+                        </div>
+                        <div class="bg-[#0f172a] p-2.5 sm:p-3 rounded-xl border border-indigo-500/30 flex justify-between items-center mt-2">
+                            <span class="text-indigo-300 font-bold">Harga Satuan per Pcs:</span>
+                            <span id="k-satuan" class="font-mono-num font-bold text-sm sm:text-base text-indigo-400">Rp 0 /pcs</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Konfigurasi & Hasil -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                <div class="bg-[#1e293b]/90 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-xl space-y-3 sm:space-y-4">
+                    <h2 class="font-bold text-xs sm:text-sm text-indigo-400 border-b border-slate-800 pb-3 flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-indigo-500"></span> 3. Konfigurasi Produk Jadi
+                    </h2>
+                    <div class="space-y-2.5 sm:space-y-3 text-xs">
+                        <div>
+                            <label class="block text-slate-400 mb-1 font-medium">Nama Kemasan Kombinasi</label>
+                            <input type="text" id="cfg-namakemasan" class="w-full bg-[#0f172a] border border-slate-700 rounded-xl px-3 py-2 text-white font-semibold">
+                        </div>
+                        <div>
+                            <label class="block text-slate-400 mb-1 font-medium">Isi Permen per Kemasan</label>
+                            <input type="text" inputmode="numeric" id="cfg-isiperkemasan" oninput="formatInput(this)" class="w-full bg-[#0f172a] border border-slate-700 rounded-xl px-3 py-2 text-white font-mono-num font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 sm:gap-3 pt-1">
+                            <div class="bg-[#0f172a] p-2.5 sm:p-3 rounded-xl border border-slate-800">
+                                <span class="text-[10px] text-slate-400 block mb-1">Kemasan Jadi Permen</span>
+                                <span id="cfg-kemasanjadi" class="font-mono-num font-bold text-xs sm:text-sm text-amber-400">0 kemasan</span>
+                            </div>
+                            <div class="bg-[#0f172a] p-2.5 sm:p-3 rounded-xl border border-slate-800">
+                                <span class="text-[10px] text-slate-400 block mb-1">Stok Kemasan Tersedia</span>
+                                <span id="cfg-stokkemasan" class="font-mono-num font-bold text-xs sm:text-sm text-indigo-300">0 pcs</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-[#1e293b]/90 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-xl space-y-3 sm:space-y-4">
+                    <h2 class="font-bold text-xs sm:text-sm text-emerald-400 border-b border-slate-800 pb-3 flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span> 4. Hasil Modal & Keuntungan
+                    </h2>
+                    
+                    <div class="space-y-2 text-xs">
+                        <div class="flex justify-between items-center bg-[#0f172a] p-2.5 rounded-xl border border-slate-800">
+                            <span class="text-slate-400">Modal Permen Kemasan:</span>
+                            <span id="res-modalpermen" class="font-mono-num font-bold text-emerald-400">Rp 0</span>
+                        </div>
+                        <div class="flex justify-between items-center bg-[#0f172a] p-2.5 rounded-xl border border-slate-800">
+                            <span class="text-slate-400">Modal Stok Kemasan:</span>
+                            <span id="res-modalkemasan" class="font-mono-num font-bold text-indigo-400">Rp 0</span>
+                        </div>
+                        <div class="flex justify-between items-center bg-[#0f172a] p-3 rounded-xl border border-amber-500/30">
+                            <span class="text-amber-300 font-bold">Total Modal (HPP):</span>
+                            <span id="res-totalmodal" class="font-mono-num font-bold text-sm sm:text-base text-amber-400">Rp 0</span>
+                        </div>
+                        
+                        <div class="pt-1">
+                            <label class="block text-slate-400 mb-1 font-medium">Harga Jual per Kemasan</label>
+                            <input type="text" inputmode="numeric" id="res-hargajual" oninput="formatInput(this)" class="w-full bg-[#0f172a] border border-slate-700 rounded-xl px-3 py-2 text-white font-mono-num font-bold text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2 sm:gap-3 pt-1">
+                            <div class="bg-[#0f172a] p-2.5 sm:p-3 rounded-xl border border-slate-800">
+                                <span class="text-[10px] text-slate-400 block mb-1">Laba Bersih / Kemasan</span>
+                                <span id="res-laba" class="font-mono-num font-bold text-xs sm:text-sm text-emerald-400">Rp 0</span>
+                            </div>
+                            <div class="bg-[#0f172a] p-2.5 sm:p-3 rounded-xl border border-slate-800">
+                                <span class="text-[10px] text-slate-400 block mb-1">Total Kemasan (Acuan)</span>
+                                <span id="res-totalkemasan" class="font-mono-num font-bold text-xs sm:text-sm text-indigo-300">0</span>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between items-center bg-[#0f172a] p-3 rounded-xl border border-emerald-500/40 mt-1">
+                            <span class="text-emerald-300 font-bold text-xs sm:text-sm">Laba Keseluruhan:</span>
+                            <span id="res-labakeseluruhan" class="font-mono-num font-bold text-base sm:text-lg text-emerald-400">Rp 0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rekap Akhir -->
+            <div class="bg-[#1e293b]/90 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-xl space-y-3 sm:space-y-4">
+                <div class="border-b border-slate-800 pb-3 flex items-center justify-between">
+                    <h2 class="font-bold text-xs sm:text-sm text-slate-200 flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-sky-400"></span> Keterangan / Rekapitulasi Akhir Bisnis
+                    </h2>
+                    <span class="text-[9px] sm:text-[10px] bg-sky-950/60 text-sky-300 px-2.5 py-1 rounded-md font-semibold border border-sky-800/50">Ringkasan Total</span>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 text-xs">
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center p-2.5 bg-[#0f172a] rounded-xl border border-slate-800">
+                            <span class="text-slate-400 font-medium">Modal Permen (Total Belanja):</span>
+                            <span id="ket-modalpermen" class="font-mono-num font-bold text-white">Rp 0</span>
+                        </div>
+                        <div class="flex justify-between items-center p-2.5 bg-[#0f172a] rounded-xl border border-slate-800">
+                            <span class="text-slate-400 font-medium">Modal Kemasan (Total Belanja):</span>
+                            <span id="ket-modalkemasan" class="font-mono-num font-bold text-white">Rp 0</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-[#0f172a] rounded-xl border border-emerald-500/30">
+                            <span class="text-emerald-300 font-bold">Total Modal Gabungan (Belanja):</span>
+                            <span id="ket-totalmodal" class="font-mono-num font-bold text-emerald-400 text-xs sm:text-sm">Rp 0</span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center p-2.5 bg-[#0f172a] rounded-xl border border-slate-800">
+                            <span class="text-slate-400 font-medium">Jumlah Hasil Kemasan:</span>
+                            <span id="ket-jumlahkemasan" class="font-mono-num font-bold text-white">0</span>
+                        </div>
+                        <div class="flex justify-between items-center p-2.5 bg-[#0f172a] rounded-xl border border-slate-800">
+                            <span class="text-slate-400 font-medium">Harga Modal / HPP Kemasan:</span>
+                            <span id="ket-hargamodalkemasan" class="font-mono-num font-bold text-white">Rp 0</span>
+                        </div>
+                        <div class="flex justify-between items-center p-2.5 bg-[#0f172a] rounded-xl border border-slate-800">
+                            <span class="text-slate-400 font-medium">Untung per Pcs / Toples:</span>
+                            <span id="ket-untungperpcs" class="font-mono-num font-bold text-emerald-400">Rp 0</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-[#0f172a] rounded-xl border border-indigo-500/30">
+                            <span class="text-indigo-300 font-bold">Untung Bersih Keseluruhan:</span>
+                            <span id="ket-untungbersih" class="font-mono-num font-bold text-indigo-400 text-xs sm:text-sm">Rp 0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex gap-2 sm:gap-3 pt-3 border-t border-slate-800">
+                    <button onclick="confirmResetData()" class="px-3 sm:px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl font-semibold text-xs transition-all">Reset</button>
+                    <button onclick="confirmSimpanData()" class="flex-1 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-semibold text-xs shadow-lg shadow-indigo-600/30 transition-all">Simpan ke Rekap & Nota Belanja</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MENU 2: REKAP & STOK -->
+        <div id="tab-rekap" class="hidden space-y-6">
+            <div class="bg-[#1e293b]/90 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-xl space-y-5">
+                <div class="border-b border-slate-800 pb-4 flex justify-between items-center">
+                    <div>
+                        <h2 class="font-bold text-base sm:text-lg text-white">Pusat Rekapitulasi Finansial Bisnis</h2>
+                        <p class="text-xs text-slate-400">Akumulasi total modal belanja, biaya plastik, dan laba bersih</p>
+                    </div>
+                    <span class="text-xs bg-indigo-500/10 text-indigo-400 px-3 py-1 rounded-full font-semibold border border-indigo-500/20">Akuntansi Akurat</span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="bg-[#0f172a] border border-slate-800 p-4 rounded-2xl space-y-1 shadow-inner">
+                        <span class="text-[11px] text-slate-400 uppercase font-bold tracking-wider">Total Modal & Belanja</span>
+                        <div id="rekap-total-modal" class="font-mono-num font-bold text-xl text-amber-400">Rp 0</div>
+                        <p class="text-[10px] text-slate-500">Permen + Kemasan + Plastik</p>
+                    </div>
+                    <div class="bg-[#0f172a] border border-slate-800 p-4 rounded-2xl space-y-1 shadow-inner">
+                        <span class="text-[11px] text-slate-400 uppercase font-bold tracking-wider">Akumulasi Laba Bersih</span>
+                        <div id="rekap-total-laba" class="font-mono-num font-bold text-xl text-emerald-400">Rp 0</div>
+                        <p class="text-[10px] text-slate-500">Sudah dikurangi biaya plastik</p>
+                    </div>
+                    <div class="bg-[#0f172a] border border-slate-800 p-4 rounded-2xl space-y-1 shadow-inner">
+                        <span class="text-[11px] text-slate-400 uppercase font-bold tracking-wider">Potensi Pendapatan Jual</span>
+                        <div id="rekap-total-omzet" class="font-mono-num font-bold text-xl text-sky-400">Rp 0</div>
+                        <p class="text-[10px] text-slate-500">Total nilai jual keseluruhan</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-[#1e293b]/90 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-xl space-y-4">
+                <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                    <div>
+                        <h2 class="font-bold text-sm sm:text-base text-white">Daftar Stok Barang & Riwayat Analisis</h2>
+                        <p class="text-[11px] sm:text-xs text-slate-400">Master data terpadu (Hapus atau Edit item di sini)</p>
+                    </div>
+                    <button onclick="confirmClearStok()" class="px-2.5 py-1.5 bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 rounded-lg text-xs font-semibold border border-rose-500/20">Hapus Semua</button>
+                </div>
+                
+                <div id="stok-container" class="space-y-3"></div>
+            </div>
+        </div>
+
+        <!-- MENU 3: PERLENGKAPAN KEMAS -->
+        <div id="tab-plastik" class="hidden space-y-6">
+            <div class="bg-[#1e293b]/90 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-xl space-y-5">
+                <div class="border-b border-slate-800 pb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                    <div>
+                        <h2 class="font-bold text-base sm:text-lg text-white">Belanja Perlengkapan Kemas (Plastik Pembungkus)</h2>
+                        <p class="text-xs text-slate-400">Pencatatan biaya operasional perlengkapan kemas yang otomatis terakumulasi ke Nota Belanja</p>
+                    </div>
+                    <span class="text-xs bg-amber-500/10 text-amber-400 px-3 py-1 rounded-full font-semibold border border-amber-500/20">Biaya Pengurang Laba</span>
+                </div>
+
+                <div class="bg-[#0f172a] border border-slate-800 p-4 rounded-2xl space-y-3">
+                    <input type="hidden" id="pls-edit-index" value="">
+                    <h3 id="pls-form-title" class="font-bold text-xs text-indigo-400 uppercase tracking-wider">Tambah Item Perlengkapan Baru</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+                        <div>
+                            <label class="block text-slate-400 mb-1">Nama Plastik</label>
+                            <input type="text" id="pls-nama" class="w-full bg-[#1e293b] border border-slate-700 rounded-xl px-3 py-2 text-white font-semibold">
+                        </div>
+                        <div>
+                            <label class="block text-slate-400 mb-1">Ukuran Plastik</label>
+                            <input type="text" id="pls-ukuran" class="w-full bg-[#1e293b] border border-slate-700 rounded-xl px-3 py-2 text-white font-semibold">
+                        </div>
+                        <div>
+                            <label class="block text-slate-400 mb-1">Kebutuhan u/ Permen</label>
+                            <input type="text" id="pls-kebutuhan" class="w-full bg-[#1e293b] border border-slate-700 rounded-xl px-3 py-2 text-white font-semibold">
+                        </div>
+                        <div>
+                            <label class="block text-slate-400 mb-1">Keterangan Belanja</label>
+                            <input type="text" id="pls-ket" class="w-full bg-[#1e293b] border border-slate-700 rounded-xl px-3 py-2 text-white font-semibold">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs pt-1">
+                        <div>
+                            <label class="block text-slate-400 mb-1">Harga Satuan (Rp)</label>
+                            <input type="text" inputmode="numeric" id="pls-harga" oninput="formatInput(this)" class="w-full bg-[#1e293b] border border-slate-700 rounded-xl px-3 py-2 text-white font-mono-num font-bold">
+                        </div>
+                        <div>
+                            <label class="block text-slate-400 mb-1">QTY (Jumlah)</label>
+                            <input type="text" inputmode="numeric" id="pls-qty" oninput="formatInput(this)" class="w-full bg-[#1e293b] border border-slate-700 rounded-xl px-3 py-2 text-white font-mono-num font-bold">
+                        </div>
+                        <div>
+                            <label class="block text-slate-400 mb-1">Kemasan (Satuan)</label>
+                            <input type="text" id="pls-kemasan" value="kg" class="w-full bg-[#1e293b] border border-slate-700 rounded-xl px-3 py-2 text-white font-semibold">
+                        </div>
+                    </div>
+                    <div class="pt-2 flex justify-end gap-2">
+                        <button id="pls-cancel-btn" onclick="resetPlastikForm()" class="hidden px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition-all">Batal Edit</button>
+                        <button id="pls-submit-btn" onclick="simpanPlastikItem()" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold shadow-lg shadow-indigo-600/30 transition-all">Tambah ke Daftar Belanja Plastik</button>
+                    </div>
+                </div>
+
+                <div class="space-y-3 pt-2">
+                    <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                        <h3 class="font-bold text-xs sm:text-sm text-slate-200 uppercase tracking-wider">Tabel Daftar Belanja Perlengkapan Kemas</h3>
+                        <button onclick="confirmClearPlastik()" class="px-2.5 py-1 bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 rounded-lg text-xs font-semibold border border-rose-500/20">Hapus Semua</button>
+                    </div>
+                    
+                    <div class="overflow-x-auto rounded-xl border border-slate-800 bg-[#0f172a]">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="bg-slate-900/90 text-slate-400 border-b border-slate-800 text-[11px] uppercase tracking-wider">
+                                    <th class="p-3 font-semibold">Nama Plastik</th>
+                                    <th class="p-3 font-semibold">Ukuran</th>
+                                    <th class="p-3 font-semibold">Kebutuhan u/ Permen</th>
+                                    <th class="p-3 font-semibold">Harga</th>
+                                    <th class="p-3 font-semibold">QTY</th>
+                                    <th class="p-3 font-semibold">Kemasan</th>
+                                    <th class="p-3 font-semibold text-right">Jumlah Total</th>
+                                    <th class="p-3 font-semibold">Keterangan</th>
+                                    <th class="p-3 font-semibold text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="plastik-table-body" class="divide-y divide-slate-800/60"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MENU 4: NOTA BELANJA (DENGAN 5 KOTAK KARTU METRIK DI TENGAH/CENTER) -->
+        <div id="tab-nota" class="hidden space-y-6">
+            <div class="bg-[#1e293b]/90 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-xl space-y-5">
+                <div class="border-b border-slate-800 pb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                    <div>
+                        <h2 class="font-bold text-base sm:text-lg text-white">Rekap Persiapan Nota Belanja</h2>
+                        <p class="text-xs text-slate-400">Laporan resmi keuangan, rincian produk, dan kebutuhan perlengkapan kemas siap cetak</p>
+                    </div>
+                    <div class="flex gap-2 w-full sm:w-auto">
+                        <button onclick="window.print()" class="flex-1 sm:flex-none px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2 transition-all">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                            Cetak / Simpan PDF
+                        </button>
+                        <button onclick="confirmClearNota()" class="px-3 py-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 rounded-xl text-xs font-bold border border-rose-500/20 transition-all no-print">Reset Nota</button>
+                    </div>
+                </div>
+
+                <!-- AREA CETAK INVOICE / NOTA MODEREN -->
+                <div id="print-area" class="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-8 space-y-6 text-slate-100 shadow-2xl">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-800 pb-6 gap-4">
+                        <div>
+                            <span class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest bg-indigo-500/10 px-2.5 py-1 rounded-md border border-indigo-500/20">Official Invoice / Nota Belanja</span>
+                            <h3 class="text-xl sm:text-2xl font-black text-white mt-2">Kalkulator Analisa Nikmat Abadi</h3>
+                            <p class="text-xs text-slate-400 mt-0.5">Laporan Rincian Modal Belanja, Perlengkapan Kemas & Laba Bersih</p>
+                        </div>
+                        <div class="text-left sm:text-right space-y-1">
+                            <p class="text-xs text-slate-300 font-medium"><span class="text-slate-400">Tanggal Cetak:</span> <span id="nota-tanggal-sekarang">-</span></p>
+                            <p class="text-xs text-slate-300 font-medium"><span class="text-slate-400">Status:</span> <span class="text-emerald-400 font-bold">Resmi & Terverifikasi</span></p>
+                        </div>
+                    </div>
+
+                    <!-- 5 KOTAK KARTU METRIK (POSISI DI TENGAH / TEXT CENTER) -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 pt-2">
+                        <!-- 1. Total Belanja Permen -->
+                        <div class="bg-[#1e293b]/70 border border-slate-800 p-4 rounded-xl space-y-1 text-center flex flex-col justify-center items-center">
+                            <span class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Total Belanja Permen</span>
+                            <div id="nota-sum-permen" class="font-mono-num font-bold text-base sm:text-lg text-amber-400">Rp 0</div>
+                        </div>
+                        <!-- 2. Total Belanja Kemasan -->
+                        <div class="bg-[#1e293b]/70 border border-slate-800 p-4 rounded-xl space-y-1 text-center flex flex-col justify-center items-center">
+                            <span class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Total Belanja Kemasan</span>
+                            <div id="nota-sum-kemasan" class="font-mono-num font-bold text-base sm:text-lg text-indigo-400">Rp 0</div>
+                        </div>
+                        <!-- 3. Total Belanja Perlengkapan (Warna Merah sebagai Pengurang Laba) -->
+                        <div class="bg-rose-950/40 border border-rose-500/40 p-4 rounded-xl space-y-1 text-center flex flex-col justify-center items-center">
+                            <span class="text-[10px] text-rose-300 uppercase font-bold tracking-wider">Total Belanja Perlengkapan</span>
+                            <div id="nota-sum-plastik" class="font-mono-num font-bold text-base sm:text-lg text-rose-400">Rp 0</div>
+                        </div>
+                        <!-- 4. Akumulasi Total Modal Belanja -->
+                        <div class="bg-[#1e293b]/70 border border-slate-800 p-4 rounded-xl space-y-1 text-center flex flex-col justify-center items-center">
+                            <span class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Akumulasi Total Modal</span>
+                            <div id="nota-sum-modal" class="font-mono-num font-bold text-base sm:text-lg text-sky-400">Rp 0</div>
+                        </div>
+                        <!-- 5. Estimasi Total Laba Bersih -->
+                        <div class="bg-[#1e293b]/70 border border-slate-800 p-4 rounded-xl space-y-1 text-center flex flex-col justify-center items-center">
+                            <span class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Estimasi Laba Bersih</span>
+                            <div id="nota-sum-laba" class="font-mono-num font-bold text-base sm:text-lg text-emerald-400">Rp 0</div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3 pt-2">
+                        <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider border-b border-slate-800 pb-2">Rincian Kombinasi Produk & Kebutuhan Belanja</h4>
+                        <div id="nota-items-container" class="space-y-3"></div>
+                    </div>
+
+                    <div class="space-y-3 pt-4">
+                        <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider border-b border-slate-800 pb-2">Rincian Belanja Perlengkapan Kemas (Plastik)</h4>
+                        <div id="nota-plastik-container" class="space-y-2"></div>
+                    </div>
+
+                    <div class="pt-6 border-t border-slate-800 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-slate-400">
+                        <p>Terima kasih atas kerja sama Anda. Semoga usaha senantiasa diberi keberkahan & nikmat yang abadi.</p>
+                        <div class="text-center sm:text-right">
+                            <p class="font-bold text-slate-200">Bagian Keuangan / Pimpinan</p>
+                            <div class="h-12"></div>
+                            <p class="border-t border-slate-700 pt-1 px-6 font-semibold text-slate-400">( Tanda Tangan & Stempel )</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- BOTTOM NAVIGATION BAR HP -->
+    <nav class="sm:hidden fixed bottom-0 left-0 right-0 bg-[#1e293b]/95 backdrop-blur-md border-t border-slate-800 px-1 py-2 flex justify-around items-center z-40 shadow-2xl">
+        <button onclick="switchTab('kalkulator')" id="nav-kalkulator-mob" class="flex flex-col items-center gap-1 text-indigo-400">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+            <span class="text-[8px] font-bold">Kalkulator</span>
+        </button>
+        <button onclick="switchTab('rekap')" id="nav-rekap-mob" class="flex flex-col items-center gap-1 text-slate-400 hover:text-white">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+            <span class="text-[8px] font-bold">Rekap</span>
+        </button>
+        <button onclick="switchTab('plastik')" id="nav-plastik-mob" class="flex flex-col items-center gap-1 text-slate-400 hover:text-white">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+            <span class="text-[8px] font-bold">Plastik</span>
+        </button>
+        <button onclick="switchTab('nota')" id="nav-nota-mob" class="flex flex-col items-center gap-1 text-slate-400 hover:text-white">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+            <span class="text-[8px] font-bold">Nota</span>
+        </button>
+    </nav>
+
+    <!-- MODAL KONFIRMASI -->
+    <div id="custom-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 backdrop-blur-sm hidden px-4">
+        <div class="bg-[#1e293b] border border-slate-700/80 rounded-2xl p-5 sm:p-6 max-w-sm w-full mx-auto shadow-2xl modal-animate text-center space-y-4">
+            <div id="modal-icon-bg" class="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto">
+                <svg id="modal-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"></svg>
+            </div>
+            <div>
+                <h3 id="modal-title" class="font-bold text-white text-base">Konfirmasi</h3>
+                <p id="modal-desc" class="text-xs text-slate-400 mt-1">Apakah Anda yakin ingin melanjutkan tindakan ini?</p>
+            </div>
+            <div id="modal-actions" class="flex gap-2 pt-2"></div>
+        </div>
+    </div>
+
+    <script>
+        function formatNumber(num) {
+            return new Intl.NumberFormat('id-ID').format(Math.round(num || 0));
+        }
+
+        function parseNum(val) {
+            if (!val) return 0;
+            if (typeof val === 'number') return val;
+            return parseFloat(val.toString().replace(/\./g, '').replace(/,/g, '.')) || 0;
+        }
+
+        function formatInput(el) {
+            let val = el.value.replace(/\D/g, '');
+            el.value = val === '' ? '' : formatNumber(parseInt(val));
+            calculate();
+        }
+
+        function openModal({ type, title, desc, onConfirm }) {
+            const modal = document.getElementById('custom-modal');
+            const iconBg = document.getElementById('modal-icon-bg');
+            const icon = document.getElementById('modal-icon');
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-desc').innerText = desc;
+            
+            const actions = document.getElementById('modal-actions');
+            actions.innerHTML = '';
+
+            if (type === 'success') {
+                iconBg.className = "w-12 h-12 bg-emerald-500/20 border border-emerald-500/30 rounded-2xl flex items-center justify-center mx-auto text-emerald-400";
+                icon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>`;
+                actions.innerHTML = `<button onclick="closeModal()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs rounded-xl shadow-lg shadow-indigo-600/30 transition-all">Oke, Mengerti</button>`;
+            } else if (type === 'confirm') {
+                iconBg.className = "w-12 h-12 bg-amber-500/20 border border-amber-500/30 rounded-2xl flex items-center justify-center mx-auto text-amber-400";
+                icon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>`;
+                actions.innerHTML = `
+                    <button onclick="closeModal()" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs rounded-xl transition-all">Batal</button>
+                    <button id="modal-confirm-btn" class="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs rounded-xl shadow-lg shadow-indigo-600/30 transition-all">Ya, Lanjutkan</button>
+                `;
+                document.getElementById('modal-confirm-btn').onclick = () => { closeModal(); if (onConfirm) onConfirm(); };
+            } else if (type === 'danger') {
+                iconBg.className = "w-12 h-12 bg-rose-500/20 border border-rose-500/30 rounded-2xl flex items-center justify-center mx-auto text-rose-400";
+                icon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>`;
+                actions.innerHTML = `
+                    <button onclick="closeModal()" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs rounded-xl transition-all">Batal</button>
+                    <button id="modal-confirm-btn" class="flex-1 py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-semibold text-xs rounded-xl shadow-lg shadow-rose-600/30 transition-all">Ya, Hapus</button>
+                `;
+                document.getElementById('modal-confirm-btn').onclick = () => { closeModal(); if (onConfirm) onConfirm(); };
+            }
+            modal.classList.remove('hidden');
+        }
+
+        function closeModal() { document.getElementById('custom-modal').classList.add('hidden'); }
+
+        function switchTab(tab) {
+            ['kalkulator', 'rekap', 'plastik', 'nota'].forEach(t => {
+                let tabEl = document.getElementById(`tab-${t}`);
+                if(tabEl) tabEl.classList.add('hidden');
+                
+                let deskBtn = document.getElementById(`nav-${t}-desk`);
+                if(deskBtn) deskBtn.className = "px-3.5 py-2 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white";
+                
+                let mobBtn = document.getElementById(`nav-${t}-mob`);
+                if(mobBtn) mobBtn.className = "flex flex-col items-center gap-1 text-slate-400 hover:text-white";
+            });
+
+            let activeTabEl = document.getElementById(`tab-${tab}`);
+            if(activeTabEl) activeTabEl.classList.remove('hidden');
+            
+            let activeDesk = document.getElementById(`nav-${tab}-desk`);
+            if(activeDesk) activeDesk.className = "px-3.5 py-2 rounded-lg text-xs font-bold transition-all bg-indigo-600 text-white shadow-md";
+            
+            let activeMob = document.getElementById(`nav-${tab}-mob`);
+            if(activeMob) activeMob.className = "flex flex-col items-center gap-1 text-indigo-400";
+            
+            if (tab === 'plastik') renderPlastikTable();
+            if (tab === 'rekap') renderRekapData();
+            if (tab === 'nota') renderNotaBelanja();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function calculate() {
+            let pHargaDus = parseNum(document.getElementById('p-harga').value);
+            let pJmlBelanja = parseNum(document.getElementById('p-jml').value);
+            let pDus = parseNum(document.getElementById('p-dus').value) || pJmlBelanja;
+            let pIsiDus = parseNum(document.getElementById('p-isidus').value);
+            let pIsiPack = parseNum(document.getElementById('p-isipack').value);
+
+            let pTotalBelanjaDus = pHargaDus * pJmlBelanja;
+            let pT1Dus = pIsiDus * pIsiPack;
+            let pTotalButirDus = pDus * pT1Dus;
+
+            document.getElementById('p-total-belanja').innerText = `Rp ${formatNumber(pTotalBelanjaDus)}`;
+            document.getElementById('p-tbutir').innerText = `${formatNumber(pTotalButirDus)} butir`;
+
+            let ppcsHarga = parseNum(document.getElementById('ppcs-harga').value);
+            let ppcsJml = parseNum(document.getElementById('ppcs-jml').value);
+            let ppcsBanyakPack = parseNum(document.getElementById('ppcs-banyakpack').value) || ppcsJml;
+            let ppcsIsiPerPack = parseNum(document.getElementById('ppcs-isiperpack').value);
+            let ppcsIsiPackButir = parseNum(document.getElementById('ppcs-isipackbutir').value);
+
+            let ppcsTotalBelanjaPack = ppcsHarga * ppcsJml;
+            let ppcsTotalButirPack = ppcsBanyakPack * (ppcsIsiPerPack * ppcsIsiPackButir);
+
+            document.getElementById('ppcs-total-belanja').innerText = `Rp ${formatNumber(ppcsTotalBelanjaPack)}`;
+            document.getElementById('ppcs-tpack').innerText = `${formatNumber(ppcsTotalButirPack)} butir`;
+
+            let totalBelanjaPermenGabungan = pTotalBelanjaDus + ppcsTotalBelanjaPack;
+            let totalButirPermenGabungan = pTotalButirDus + ppcsTotalButirPack;
+            let hargaSatuanPermenGabungan = totalButirPermenGabungan > 0 ? totalBelanjaPermenGabungan / totalButirPermenGabungan : 0;
+
+            document.getElementById('akumulasi-total-belanja').innerText = `Rp ${formatNumber(totalBelanjaPermenGabungan)}`;
+            document.getElementById('akumulasi-total-butir').innerText = `${formatNumber(totalButirPermenGabungan)} butir`;
+            document.getElementById('akumulasi-harga-satuan').innerText = `Rp ${formatNumber(hargaSatuanPermenGabungan)} /butir`;
+
+            let kHarga = parseNum(document.getElementById('k-harga').value);
+            let kJmlBelanja = parseNum(document.getElementById('k-jml').value);
+            let kLusin = parseNum(document.getElementById('k-lusin').value) || kJmlBelanja;
+            let kIsiLusin = parseNum(document.getElementById('k-isilusin').value);
+
+            let kTotalBelanja = kHarga * kJmlBelanja;
+            let kTotalBarang = kLusin * kIsiLusin;
+            let kHargaSatuan = kTotalBarang > 0 ? kTotalBelanja / kTotalBarang : 0;
+
+            document.getElementById('k-total-belanja').innerText = `Rp ${formatNumber(kTotalBelanja)}`;
+            document.getElementById('k-tbarang').innerText = `${formatNumber(kTotalBarang)} pcs`;
+            document.getElementById('k-satuan').innerText = `Rp ${formatNumber(kHargaSatuan)} /pcs`;
+
+            let cfgIsiPerKemasan = parseNum(document.getElementById('cfg-isiperkemasan').value) || 0;
+            let cfgKemasanJadi = cfgIsiPerKemasan > 0 ? Math.floor(totalButirPermenGabungan / cfgIsiPerKemasan) : 0;
+            let cfgStokKemasan = kTotalBarang;
+
+            document.getElementById('cfg-kemasanjadi').innerText = `${formatNumber(cfgKemasanJadi)} kemasan`;
+            document.getElementById('cfg-stokkemasan').innerText = `${formatNumber(cfgStokKemasan)} pcs`;
+
+            let modalPermenKemasan = cfgIsiPerKemasan * hargaSatuanPermenGabungan;
+            let modalStokKemasan = kHargaSatuan;
+            let totalModalHPP = modalPermenKemasan + modalStokKemasan;
+
+            document.getElementById('res-modalpermen').innerText = `Rp ${formatNumber(modalPermenKemasan)}`;
+            document.getElementById('res-modalkemasan').innerText = `Rp ${formatNumber(modalStokKemasan)}`;
+            document.getElementById('res-totalmodal').innerText = `Rp ${formatNumber(totalModalHPP)}`;
+
+            let hargaJual = parseNum(document.getElementById('res-hargajual').value);
+            let labaPerKemasan = hargaJual - totalModalHPP;
+            let totalKemasanAcuan = Math.min(cfgKemasanJadi, cfgStokKemasan);
+            let labaKeseluruhan = labaPerKemasan * (totalKemasanAcuan > 0 ? totalKemasanAcuan : cfgKemasanJadi);
+
+            document.getElementById('res-laba').innerText = `Rp ${formatNumber(labaPerKemasan)}`;
+            document.getElementById('res-totalkemasan').innerText = formatNumber(totalKemasanAcuan > 0 ? totalKemasanAcuan : cfgKemasanJadi);
+            document.getElementById('res-labakeseluruhan').innerText = `Rp ${formatNumber(labaKeseluruhan)}`;
+
+            let totalModalGabunganBisnis = totalBelanjaPermenGabungan + kTotalBelanja;
+            document.getElementById('ket-modalpermen').innerText = `Rp ${formatNumber(totalBelanjaPermenGabungan)}`;
+            document.getElementById('ket-modalkemasan').innerText = `Rp ${formatNumber(kTotalBelanja)}`;
+            document.getElementById('ket-totalmodal').innerText = `Rp ${formatNumber(totalModalGabunganBisnis)}`;
+            document.getElementById('ket-jumlahkemasan').innerText = formatNumber(cfgKemasanJadi);
+            document.getElementById('ket-hargamodalkemasan').innerText = `Rp ${formatNumber(totalModalHPP)}`;
+            document.getElementById('ket-untungperpcs').innerText = `Rp ${formatNumber(labaPerKemasan)}`;
+            document.getElementById('ket-untungbersih').innerText = `Rp ${formatNumber(labaKeseluruhan)}`;
+        }
+
+        function simpanPlastikItem() {
+            let nama = document.getElementById('pls-nama').value.trim();
+            let ukuran = document.getElementById('pls-ukuran').value.trim();
+            let kebutuhan = document.getElementById('pls-kebutuhan').value.trim();
+            let harga = parseNum(document.getElementById('pls-harga').value);
+            let qty = parseNum(document.getElementById('pls-qty').value);
+            let kemasan = document.getElementById('pls-kemasan').value.trim() || 'kg';
+            let ket = document.getElementById('pls-ket').value.trim();
+            let editIdx = document.getElementById('pls-edit-index').value;
+
+            if (!nama || harga <= 0 || qty <= 0) {
+                openModal({ type: 'danger', title: 'Data Belum Lengkap', desc: 'Nama plastik, harga satuan, dan QTY wajib diisi dengan benar.' });
+                return;
+            }
+
+            openModal({
+                type: 'confirm',
+                title: editIdx === "" ? 'Simpan Item Plastik?' : 'Perbarui Item Plastik?',
+                desc: editIdx === "" ? 'Item perlengkapan kemas ini akan ditambahkan ke daftar.' : 'Perubahan data perlengkapan kemas akan disimpan.',
+                onConfirm: () => {
+                    let newItem = { nama, ukuran, kebutuhan, harga, qty, kemasan, ket, jumlah: harga * qty };
+                    let plastikList = JSON.parse(localStorage.getItem('master_data_plastik_app') || '[]');
+
+                    if (editIdx === "") {
+                        plastikList.push(newItem);
+                    } else {
+                        plastikList[parseInt(editIdx)] = newItem;
+                    }
+
+                    localStorage.setItem('master_data_plastik_app', JSON.stringify(plastikList));
+                    resetPlastikForm();
+                    renderPlastikTable();
+                    openModal({ type: 'success', title: 'Berhasil Disimpan', desc: 'Data perlengkapan kemas telah diperbarui.' });
+                }
+            });
+        }
+
+        function editPlastikItem(idx) {
+            let plastikList = JSON.parse(localStorage.getItem('master_data_plastik_app') || '[]');
+            let item = plastikList[idx];
+            if (!item) return;
+
+            document.getElementById('pls-nama').value = item.nama;
+            document.getElementById('pls-ukuran').value = item.ukuran;
+            document.getElementById('pls-kebutuhan').value = item.kebutuhan;
+            document.getElementById('pls-harga').value = formatNumber(item.harga);
+            document.getElementById('pls-qty').value = formatNumber(item.qty);
+            document.getElementById('pls-kemasan').value = item.kemasan;
+            document.getElementById('pls-ket').value = item.ket;
+            document.getElementById('pls-edit-index').value = idx;
+
+            document.getElementById('pls-form-title').innerText = "Edit Item Perlengkapan Kemas";
+            document.getElementById('pls-submit-btn').innerText = "Perbarui Data";
+            document.getElementById('pls-cancel-btn').classList.remove('hidden');
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function resetPlastikForm() {
+            document.getElementById('pls-nama').value = '';
+            document.getElementById('pls-ukuran').value = '';
+            document.getElementById('pls-kebutuhan').value = '';
+            document.getElementById('pls-harga').value = '';
+            document.getElementById('pls-qty').value = '';
+            document.getElementById('pls-kemasan').value = 'kg';
+            document.getElementById('pls-ket').value = '';
+            document.getElementById('pls-edit-index').value = '';
+
+            document.getElementById('pls-form-title').innerText = "Tambah Item Perlengkapan Baru";
+            document.getElementById('pls-submit-btn').innerText = "Tambah ke Daftar Belanja Plastik";
+            document.getElementById('pls-cancel-btn').classList.add('hidden');
+        }
+
+        function renderPlastikTable() {
+            let plastikList = JSON.parse(localStorage.getItem('master_data_plastik_app') || '[]');
+            let tbody = document.getElementById('plastik-table-body');
+
+            if (plastikList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="9" class="text-slate-500 text-xs text-center py-6">Belum ada data perlengkapan kemas. Silakan tambahkan di atas.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = plastikList.map((item, idx) => `
+                <tr class="hover:bg-slate-800/40 transition-all">
+                    <td class="p-3 font-bold text-white">${item.nama}</td>
+                    <td class="p-3 text-slate-300">${item.ukuran || '-'}</td>
+                    <td class="p-3 text-slate-300">${item.kebutuhan || '-'}</td>
+                    <td class="p-3 font-mono-num text-amber-300">Rp ${formatNumber(item.harga)}</td>
+                    <td class="p-3 font-mono-num text-slate-200">${formatNumber(item.qty)}</td>
+                    <td class="p-3 text-slate-300">${item.kemasan}</td>
+                    <td class="p-3 font-mono-num font-bold text-emerald-400 text-right">Rp ${formatNumber(item.jumlah)}</td>
+                    <td class="p-3 text-slate-400">${item.ket || '-'}</td>
+                    <td class="p-3 text-center">
+                        <div class="flex items-center justify-center gap-1.5">
+                            <button onclick="editPlastikItem(${idx})" title="Edit" class="p-1.5 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 rounded-lg border border-indigo-500/20 transition-all">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                            </button>
+                            <button onclick="hapusPlastikItem(${idx})" title="Hapus" class="p-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 rounded-lg border border-rose-500/20 transition-all">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function hapusPlastikItem(idx) {
+            openModal({
+                type: 'danger',
+                title: 'Hapus Item Plastik?',
+                desc: 'Item perlengkapan kemas ini akan dihapus dari daftar.',
+                onConfirm: () => {
+                    let plastikList = JSON.parse(localStorage.getItem('master_data_plastik_app') || '[]');
+                    plastikList.splice(idx, 1);
+                    localStorage.setItem('master_data_plastik_app', JSON.stringify(plastikList));
+                    renderPlastikTable();
+                    openModal({ type: 'success', title: 'Berhasil Dihapus', desc: 'Item berhasil dihapus.' });
+                }
+            });
+        }
+
+        function confirmClearPlastik() {
+            openModal({
+                type: 'danger',
+                title: 'Hapus Semua Plastik?',
+                desc: 'Semua daftar perlengkapan kemas akan dibersihkan.',
+                onConfirm: () => {
+                    localStorage.removeItem('master_data_plastik_app');
+                    renderPlastikTable();
+                    openModal({ type: 'success', title: 'Berhasil Dihapus', desc: 'Daftar plastik telah dikosongkan.' });
+                }
+            });
+        }
+
+        function clearFormInputs() {
+            document.getElementById('p-nama').value = "";
+            document.getElementById('p-harga').value = "";
+            document.getElementById('p-jml').value = "";
+            document.getElementById('p-dus').value = "";
+            document.getElementById('p-isidus').value = "";
+            document.getElementById('p-isipack').value = "";
+            document.getElementById('ppcs-harga').value = "";
+            document.getElementById('ppcs-jml').value = "";
+            document.getElementById('ppcs-banyakpack').value = "";
+            document.getElementById('ppcs-isiperpack').value = "";
+            document.getElementById('ppcs-isipackbutir').value = "";
+            document.getElementById('k-nama').value = "";
+            document.getElementById('k-harga').value = "";
+            document.getElementById('k-jml').value = "";
+            document.getElementById('k-lusin').value = "";
+            document.getElementById('k-isilusin').value = "";
+            document.getElementById('cfg-namakemasan').value = "";
+            document.getElementById('cfg-isiperkemasan').value = "";
+            document.getElementById('res-hargajual').value = "";
+            calculate();
+        }
+
+        function confirmResetData() {
+            openModal({
+                type: 'confirm',
+                title: 'Reset Formulir?',
+                desc: 'Semua data input saat ini akan dikosongkan.',
+                onConfirm: () => {
+                    clearFormInputs();
+                    openModal({ type: 'success', title: 'Berhasil Direset', desc: 'Formulir telah dikosongkan dan siap diisi.' });
+                }
+            });
+        }
+
+        function confirmSimpanData() {
+            openModal({
+                type: 'confirm',
+                title: 'Simpan Analisis?',
+                desc: 'Data analisis ini akan otomatis masuk ke Rekap Stok & Nota Belanja.',
+                onConfirm: () => {
+                    let pHargaDus = parseNum(document.getElementById('p-harga').value);
+                    let pJmlDus = parseNum(document.getElementById('p-jml').value);
+                    let rawBelanjaDus = pHargaDus * pJmlDus;
+
+                    let ppcsHarga = parseNum(document.getElementById('ppcs-harga').value);
+                    let ppcsJml = parseNum(document.getElementById('ppcs-jml').value);
+                    let rawBelanjaPack = ppcsHarga * ppcsJml;
+
+                    let rawBelanjaPermenTotal = rawBelanjaDus + rawBelanjaPack;
+                    let kHargaVal = parseNum(document.getElementById('k-harga').value);
+                    let kJmlVal = parseNum(document.getElementById('k-jml').value);
+                    let rawBelanjaKemasan = kHargaVal * kJmlVal;
+                    let rawTotalBelanjaGabungan = rawBelanjaPermenTotal + rawBelanjaKemasan;
+                    let rawHargaJual = parseNum(document.getElementById('res-hargajual').value);
+                    let rawJumlahKemasan = parseNum(document.getElementById('ket-jumlahkemasan').innerText);
+                    let rawLabaKeseluruhan = parseNum(document.getElementById('ket-untungbersih').innerText);
+                    let rawLabaPerPcs = parseNum(document.getElementById('res-laba').innerText);
+                    let rawOmzetItem = rawHargaJual * (rawJumlahKemasan > 0 ? rawJumlahKemasan : 1);
+                    let calculatedItemLaba = rawLabaKeseluruhan !== 0 ? rawLabaKeseluruhan : (rawOmzetItem - rawTotalBelanjaGabungan);
+                    let calculatedLabaPcs = rawLabaPerPcs !== 0 ? rawLabaPerPcs : (rawJumlahKemasan > 0 ? Math.round(calculatedItemLaba / rawJumlahKemasan) : 0);
+
+                    let data = {
+                        tanggal: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }),
+                        namaProduk: document.getElementById('cfg-namakemasan').value || 'Produk Tanpa Nama',
+                        permen: document.getElementById('p-nama').value || 'Permen Gabungan',
+                        kemasanNama: document.getElementById('k-nama').value || 'Kemasan',
+                        namaPermenText: document.getElementById('p-nama').value || 'Permen',
+                        pJmlDusVal: pJmlDus,
+                        pHargaDusVal: pHargaDus,
+                        rawBelanjaDusVal: rawBelanjaDus,
+                        ppcsJmlVal: ppcsJml,
+                        ppcsHargaVal: ppcsHarga,
+                        rawBelanjaPackVal: rawBelanjaPack,
+                        kNamaKemasanText: document.getElementById('k-nama').value || 'Kemasan',
+                        kJmlLusinVal: kJmlVal,
+                        kHargaKemasanVal: kHargaVal,
+                        rawBelanjaKemasanVal: rawBelanjaKemasan,
+                        pHarga: document.getElementById('p-harga').value,
+                        pJml: document.getElementById('p-jml').value,
+                        pDus: document.getElementById('p-dus').value,
+                        pIsiDus: document.getElementById('p-isidus').value,
+                        pIsiPack: document.getElementById('p-isipack').value,
+                        ppcsHarga: document.getElementById('ppcs-harga').value,
+                        ppcsJml: document.getElementById('ppcs-jml').value,
+                        ppcsBanyakPack: document.getElementById('ppcs-banyakpack').value,
+                        ppcsIsiPerPack: document.getElementById('ppcs-isiperpack').value,
+                        ppcsIsiPackButir: document.getElementById('ppcs-isipackbutir').value,
+                        kNama: document.getElementById('k-nama').value,
+                        kHarga: document.getElementById('k-harga').value,
+                        kJml: document.getElementById('k-jml').value,
+                        kLusin: document.getElementById('k-lusin').value,
+                        kIsiLusin: document.getElementById('k-isilusin').value,
+                        cfgIsiPerKemasan: document.getElementById('cfg-isiperkemasan').value,
+                        rawBelanjaPermen: rawBelanjaPermenTotal,
+                        rawBelanjaKemasan: rawBelanjaKemasan,
+                        rawTotalBelanja: rawTotalBelanjaGabungan,
+                        rawOmzet: rawOmzetItem,
+                        hargaJual: document.getElementById('res-hargajual').value || '0',
+                        rawJual: rawHargaJual,
+                        jumlahKemasan: rawJumlahKemasan,
+                        labaKeseluruhan: `Rp ${formatNumber(calculatedItemLaba)}`,
+                        rawLaba: calculatedItemLaba,
+                        rawLabaPerPcs: calculatedLabaPcs,
+                        stokKemasan: document.getElementById('cfg-stokkemasan').innerText,
+                        totalModal: document.getElementById('res-totalmodal').innerText
+                    };
+
+                    let dataList = JSON.parse(localStorage.getItem('master_data_permen_app') || '[]');
+                    dataList.unshift(data);
+                    localStorage.setItem('master_data_permen_app', JSON.stringify(dataList));
+
+                    clearFormInputs();
+                    openModal({ type: 'success', title: 'Berhasil Disimpan!', desc: 'Data telah masuk otomatis ke Rekap Stok & Nota Belanja.' });
+                }
+            });
+        }
+
+        function confirmClearStok() {
+            openModal({
+                type: 'danger',
+                title: 'Hapus Semua Data?',
+                desc: 'Semua rekap, stok, dan riwayat akan dibersihkan permanen.',
+                onConfirm: () => {
+                    localStorage.removeItem('master_data_permen_app');
+                    renderRekapData();
+                    renderNotaBelanja();
+                    openModal({ type: 'success', title: 'Berhasil Dihapus', desc: 'Semua data telah dibersihkan.' });
+                }
+            });
+        }
+
+        function confirmClearNota() { confirmClearStok(); }
+
+        function hapusItemData(index) {
+            openModal({
+                type: 'danger',
+                title: 'Hapus Item Ini?',
+                desc: 'Item terpilih akan dihapus dari rekap dan nota belanja.',
+                onConfirm: () => {
+                    let dataList = JSON.parse(localStorage.getItem('master_data_permen_app') || '[]');
+                    dataList.splice(index, 1);
+                    localStorage.setItem('master_data_permen_app', JSON.stringify(dataList));
+                    renderRekapData();
+                    renderNotaBelanja();
+                    openModal({ type: 'success', title: 'Berhasil Dihapus', desc: 'Data berhasil dihapus & diperbarui.' });
+                }
+            });
+        }
+
+        function editItemData(index) {
+            openModal({
+                type: 'confirm',
+                title: 'Edit Data Ini?',
+                desc: 'Data lengkap akan ditarik kembali ke formulir kalkulator untuk disesuaikan.',
+                onConfirm: () => {
+                    let dataList = JSON.parse(localStorage.getItem('master_data_permen_app') || '[]');
+                    let item = dataList[index];
+                    
+                    document.getElementById('p-nama').value = item.permen || '';
+                    document.getElementById('p-harga').value = item.pHarga || '';
+                    document.getElementById('p-jml').value = item.pJml || '';
+                    document.getElementById('p-dus').value = item.pDus || '';
+                    document.getElementById('p-isidus').value = item.pIsiDus || '';
+                    document.getElementById('p-isipack').value = item.pIsiPack || '';
+                    document.getElementById('ppcs-harga').value = item.ppcsHarga || '';
+                    document.getElementById('ppcs-jml').value = item.ppcsJml || '';
+                    document.getElementById('ppcs-banyakpack').value = item.ppcsBanyakPack || '';
+                    document.getElementById('ppcs-isiperpack').value = item.ppcsIsiPerPack || '';
+                    document.getElementById('ppcs-isipackbutir').value = item.ppcsIsiPackButir || '';
+                    document.getElementById('k-nama').value = item.kNama || '';
+                    document.getElementById('k-harga').value = item.kHarga || '';
+                    document.getElementById('k-jml').value = item.kJml || '';
+                    document.getElementById('k-lusin').value = item.kLusin || '';
+                    document.getElementById('k-isilusin').value = item.kIsiLusin || '';
+                    document.getElementById('cfg-namakemasan').value = item.namaProduk || '';
+                    document.getElementById('cfg-isiperkemasan').value = item.cfgIsiPerKemasan || '';
+                    document.getElementById('res-hargajual').value = item.hargaJual || '';
+
+                    dataList.splice(index, 1);
+                    localStorage.setItem('master_data_permen_app', JSON.stringify(dataList));
+
+                    switchTab('kalkulator');
+                    calculate();
+                    openModal({ type: 'success', title: 'Data Siap Diedit', desc: 'Silakan ubah bagian yang diperlukan lalu simpan kembali.' });
+                }
+            });
+        }
+
+        function renderRekapData() {
+            let dataList = JSON.parse(localStorage.getItem('master_data_permen_app') || '[]');
+            let plastikList = JSON.parse(localStorage.getItem('master_data_plastik_app') || '[]');
+            
+            let sumModalBarang = 0;
+            let sumOmzet = 0;
+            let totalBiayaPlastik = 0;
+
+            dataList.forEach(item => {
+                let mBelanja = (item.rawTotalBelanja !== undefined && !isNaN(item.rawTotalBelanja) && item.rawTotalBelanja > 0) ? item.rawTotalBelanja : ((item.rawBelanjaPermen || 0) + (item.rawBelanjaKemasan || 0));
+                let hJual = (item.rawJual !== undefined && !isNaN(item.rawJual)) ? item.rawJual : parseNum(item.hargaJual);
+                let j = (item.jumlahKemasan !== undefined && !isNaN(item.jumlahKemasan)) ? item.jumlahKemasan : 1;
+                let omzetItem = item.rawOmzet !== undefined && !isNaN(item.rawOmzet) && item.rawOmzet > 0 ? item.rawOmzet : (hJual * (j > 0 ? j : 1));
+
+                sumModalBarang += mBelanja;
+                sumOmzet += omzetItem;
+            });
+
+            plastikList.forEach(pls => { totalBiayaPlastik += (pls.jumlah || 0); });
+
+            let sumTotalModalBelanja = sumModalBarang + totalBiayaPlastik;
+            let sumLabaBersih = sumOmzet - sumTotalModalBelanja;
+
+            document.getElementById('rekap-total-modal').innerText = `Rp ${formatNumber(sumTotalModalBelanja)}`;
+            document.getElementById('rekap-total-laba').innerText = `Rp ${formatNumber(sumLabaBersih)}`;
+            document.getElementById('rekap-total-omzet').innerText = `Rp ${formatNumber(sumOmzet)}`;
+
+            let container = document.getElementById('stok-container');
+            if (dataList.length === 0) {
+                container.innerHTML = `<p class="text-slate-500 text-xs text-center py-8">Belum ada data tersimpan. Silakan buat analisis di menu Kalkulator & Input.</p>`;
+                return;
+            }
+
+            container.innerHTML = dataList.map((item, idx) => {
+                let mBelanja = item.rawTotalBelanja || ((item.rawBelanjaPermen || 0) + (item.rawBelanjaKemasan || 0));
+                let j = item.jumlahKemasan || 0;
+                let itemLabaVal = item.rawLaba || 0;
+                let labaPerPcsVal = item.rawLabaPerPcs !== undefined && item.rawLabaPerPcs > 0 ? item.rawLabaPerPcs : (j > 0 ? Math.round(itemLabaVal / j) : 0);
+                let permenNama = item.permen || 'Permen';
+                let kemasanNama = item.kemasanNama || 'Kemasan';
+
+                return `
+                    <div class="bg-[#0f172a] border border-slate-800 p-4 sm:p-5 rounded-2xl space-y-4 shadow-xl">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-slate-800/80 pb-3">
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-[11px] text-indigo-400 font-bold">${item.tanggal}</span>
+                                    <span class="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded-md font-medium">Stok: ${item.stokKemasan}</span>
+                                </div>
+                                <h3 class="font-black text-white text-base mt-0.5">${item.namaProduk}</h3>
+                            </div>
+                            <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+                                <button onclick="editItemData(${idx})" title="Edit Item" class="p-2.5 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 rounded-xl border border-indigo-500/20 transition-all">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                </button>
+                                <button onclick="hapusItemData(${idx})" title="Hapus Item" class="p-2.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 rounded-xl border border-rose-500/20 transition-all">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="space-y-1 text-xs">
+                            <p class="text-slate-300"><span class="text-slate-400">Permen:</span> ${permenNama} | <span class="text-slate-400">Kemasan:</span> ${kemasanNama} | <span class="text-slate-400">Hasil:</span> <span class="font-bold text-amber-300">${formatNumber(j)} kemasan</span></p>
+                            <p class="text-slate-300 font-medium">Jual: <span class="font-mono-num text-white">Rp ${item.hargaJual}</span> | HPP Satuan: <span class="font-mono-num text-white">${item.totalModal}</span> | <span class="text-emerald-400 font-bold">Laba/Pcs: Rp ${formatNumber(labaPerPcsVal)}</span></p>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3 bg-[#1e293b]/50 p-3 rounded-xl border border-slate-800/80">
+                            <div>
+                                <span class="text-[10px] text-slate-400 uppercase font-bold tracking-wider block">Modal Permen (Total)</span>
+                                <div class="font-mono-num font-bold text-sm sm:text-base text-amber-400">Rp ${formatNumber(item.rawBelanjaPermen)}</div>
+                            </div>
+                            <div>
+                                <span class="text-[10px] text-slate-400 uppercase font-bold tracking-wider block">Modal Kemasan (Total)</span>
+                                <div class="font-mono-num font-bold text-sm sm:text-base text-indigo-400">Rp ${formatNumber(item.rawBelanjaKemasan)}</div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3 pt-1">
+                            <div>
+                                <span class="text-[10px] text-slate-400 uppercase font-bold tracking-wider block">Total Modal Belanja</span>
+                                <div class="font-mono-num font-bold text-base sm:text-lg text-amber-400">Rp ${formatNumber(mBelanja)}</div>
+                            </div>
+                            <div>
+                                <span class="text-[10px] text-slate-400 uppercase font-bold tracking-wider block">Potensi Laba Bersih</span>
+                                <div class="font-mono-num font-bold text-base sm:text-lg text-emerald-400">Rp ${formatNumber(itemLabaVal)}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderNotaBelanja() {
+            let dataList = JSON.parse(localStorage.getItem('master_data_permen_app') || '[]');
+            let plastikList = JSON.parse(localStorage.getItem('master_data_plastik_app') || '[]');
+            document.getElementById('nota-tanggal-sekarang').innerText = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+
+            let sumPermen = 0;
+            let sumKemasan = 0;
+            let sumLabaKotor = 0;
+            let totalBiayaPlastik = 0;
+
+            dataList.forEach(item => {
+                sumPermen += (item.rawBelanjaPermen || 0);
+                sumKemasan += (item.rawBelanjaKemasan || 0);
+                sumLabaKotor += (item.rawLaba || 0);
+            });
+
+            plastikList.forEach(pls => { totalBiayaPlastik += (pls.jumlah || 0); });
+
+            let sumTotalModalBelanja = sumPermen + sumKemasan + totalBiayaPlastik;
+            let sumLabaBersihFinal = sumLabaKotor - totalBiayaPlastik;
+
+            // Masukkan data ke 5 kotak metrik nota
+            document.getElementById('nota-sum-permen').innerText = `Rp ${formatNumber(sumPermen)}`;
+            document.getElementById('nota-sum-kemasan').innerText = `Rp ${formatNumber(sumKemasan)}`;
+            document.getElementById('nota-sum-plastik').innerText = `Rp ${formatNumber(totalBiayaPlastik)}`;
+            document.getElementById('nota-sum-modal').innerText = `Rp ${formatNumber(sumTotalModalBelanja)}`;
+            document.getElementById('nota-sum-laba').innerText = `Rp ${formatNumber(sumLabaBersihFinal)}`;
+
+            let container = document.getElementById('nota-items-container');
+            if (dataList.length === 0) {
+                container.innerHTML = `<p class="text-slate-500 text-xs text-center py-4">Belum ada item produk untuk nota belanja.</p>`;
+            } else {
+                container.innerHTML = dataList.map((item, idx) => {
+                    let j = item.jumlahKemasan || 1;
+                    let labaPcs = item.rawLabaPerPcs !== undefined && item.rawLabaPerPcs > 0 ? item.rawLabaPerPcs : Math.round((item.rawLaba || 0) / j);
+                    
+                    let permenText = item.namaPermenText || item.permen || 'Permen';
+                    let pJmlD = item.pJmlDusVal || 0;
+                    let pHargD = item.pHargaDusVal || 0;
+                    let rawBDus = item.rawBelanjaDusVal || (pJmlD * pHargD);
+
+                    let ppJmlP = item.ppcsJmlVal || 0;
+                    let ppHargaP = item.ppcsHargaVal || 0;
+                    let rawBPack = item.rawBelanjaPackVal || (ppJmlP * ppHargaP);
+
+                    let kemasanText = item.kNamaKemasanText || item.kemasanNama || 'Kemasan';
+                    let kJmlL = item.kJmlLusinVal || 0;
+                    let kHargL = item.kHargaKemasanVal || 0;
+                    let rawBKemasan = item.rawBelanjaKemasanVal || (kJmlL * kHargL);
+
+                    let totalBelanjaItem = (item.rawTotalBelanja !== undefined && item.rawTotalBelanja > 0) ? item.rawTotalBelanja : (rawBDus + rawBPack + rawBKemasan);
+
+                    let htmlDus = pJmlD > 0 ? `<p><span class="text-slate-400">Permen (Dus):</span> ${permenText} (${formatNumber(pJmlD)} Dus) × Rp ${formatNumber(pHargD)} → <span class="font-mono-num text-amber-300 font-bold">Rp ${formatNumber(rawBDus)}</span></p>` : '';
+                    let htmlPack = ppJmlP > 0 ? `<p><span class="text-slate-400">Permen (Pack):</span> ${permenText} (${formatNumber(ppJmlP)} Pack) × Rp ${formatNumber(ppHargaP)} → <span class="font-mono-num text-sky-300 font-bold">Rp ${formatNumber(rawBPack)}</span></p>` : '';
+                    if (!htmlDus && !htmlPack && item.rawBelanjaPermen > 0) {
+                        htmlDus = `<p><span class="text-slate-400">Permen:</span> ${permenText} → <span class="font-mono-num text-amber-300 font-bold">Rp ${formatNumber(item.rawBelanjaPermen)}</span></p>`;
+                    }
+                    let htmlKemasan = kJmlL > 0 ? `<p><span class="text-slate-400">Kemasan:</span> ${kemasanText} (${formatNumber(kJmlL)} Lusin) × Rp ${formatNumber(kHargL)} → <span class="font-mono-num text-indigo-300 font-bold">Rp ${formatNumber(rawBKemasan)}</span></p>` : `<p><span class="text-slate-400">Kemasan:</span> ${kemasanText} → <span class="font-mono-num text-indigo-300 font-bold">Rp ${formatNumber(rawBKemasan)}</span></p>`;
+
+                    return `
+                        <div class="bg-slate-950/60 border border-slate-800 p-4 rounded-xl space-y-3">
+                            <div class="flex justify-between items-center border-b border-slate-800/80 pb-2">
+                                <span class="text-xs font-bold text-indigo-400">#${idx + 1} - ${item.namaProduk}</span>
+                                <span class="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded">Tgl: ${item.tanggal}</span>
+                            </div>
+                            <div class="space-y-1 text-xs text-slate-300">
+                                ${htmlDus}
+                                ${htmlPack}
+                                ${htmlKemasan}
+                                <div class="pt-1.5 border-t border-slate-800/60 flex justify-between font-bold text-slate-200">
+                                    <span>Jumlah Belanja (Permen + Kemasan):</span>
+                                    <span class="font-mono-num text-sky-400">Rp ${formatNumber(totalBelanjaItem)}</span>
+                                </div>
+                            </div>
+                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center pt-2 border-t border-slate-800/80 text-xs gap-1">
+                                <div>
+                                    <span class="text-slate-400">Hasil Kemasan:</span> <span class="font-bold text-amber-300">${formatNumber(j)} pcs</span> 
+                                    <span class="text-slate-500 mx-1">|</span> 
+                                    <span class="text-slate-400">Laba/Pcs:</span> <span class="text-emerald-400 font-bold">Rp ${formatNumber(labaPcs)}</span>
+                                </div>
+                                <div>
+                                    <span class="text-slate-400">Estimasi Laba:</span> <span class="font-mono-num text-emerald-400 font-bold text-sm">Rp ${formatNumber(item.rawLaba)}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            let plastikContainer = document.getElementById('nota-plastik-container');
+            if (plastikList.length === 0) {
+                plastikContainer.innerHTML = `<p class="text-slate-500 text-xs text-center py-4">Belum ada data belanja perlengkapan kemas (plastik).</p>`;
+            } else {
+                plastikContainer.innerHTML = plastikList.map((pls, pIdx) => `
+                    <div class="bg-slate-950/60 border border-slate-800 p-3 rounded-xl flex justify-between items-center text-xs">
+                        <div>
+                            <span class="font-bold text-white">${pIdx + 1}. Plastik ${pls.nama} (${pls.ukuran})</span>
+                            <p class="text-slate-400">Kebutuhan: ${pls.kebutuhan} | QTY: ${formatNumber(pls.qty)} ${pls.kemasan} × Rp ${formatNumber(pls.harga)} | <span class="text-amber-300">${pls.ket || '-'}</span></p>
+                        </div>
+                        <div class="text-right">
+                            <span class="font-mono-num font-bold text-indigo-300 text-sm">Rp ${formatNumber(pls.jumlah)}</span>
+                        </div>
+                    </div>
+                `).join('') + `
+                    <div class="bg-rose-950/30 border border-rose-500/30 p-3 rounded-xl flex justify-between items-center text-xs font-bold text-rose-300">
+                        <span>Total Keseluruhan Perlengkapan Kemas (Pengurang Laba):</span>
+                        <span class="font-mono-num text-rose-400 text-sm">Rp ${formatNumber(totalBiayaPlastik)}</span>
+                    </div>
+                `;
+            }
+        }
+
+        window.onload = function() {
+            calculate();
+        };
+    </script>
+</body>
+</html>
