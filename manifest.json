@@ -1,15 +1,16 @@
 {
-  "name": "Analisa Nikmat Abadi",
+  "name": "Kalkulator Analisa Nikmat Abadi",
   "short_name": "Nikmat Abadi",
-  "start_url": "/analisa-nikmat-abadi/",
+  "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#0b0f19",
-  "theme_color": "#1e293b",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
   "icons": [
     {
-      "src": "logo.png",
+      "src": "./logo.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
